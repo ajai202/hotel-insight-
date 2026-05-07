@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "Income": {
+      "title": "Income",
+      "description": "Daily hotel income records",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date-time", "description": "ISO date string" },
+        "source": { "type": "string", "description": "Source of income (e.g., Room Booking, Restaurant)" },
+        "amount": { "type": "number", "description": "Amount in currency" },
+        "description": { "type": "string", "description": "Details about the income" },
+        "createdBy": { "type": "string", "description": "UID of the admin who added it" }
+      },
+      "required": ["date", "source", "amount", "createdBy"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Daily hotel expense records",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date-time", "description": "ISO date string" },
+        "category": { "type": "string", "description": "Expense category (e.g., Salary, Maintenance, Food)" },
+        "amount": { "type": "number", "description": "Amount in currency" },
+        "description": { "type": "string", "description": "Details about the expense" },
+        "createdBy": { "type": "string", "description": "UID of the admin who added it" }
+      },
+      "required": ["date", "category", "amount", "createdBy"]
+    },
+    "AppAdmin": {
+      "title": "AppAdmin",
+      "description": "Administrator profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin"] }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "incomes": {
+      "schema": "Income",
+      "description": "Collection of all income records"
+    },
+    "expenses": {
+      "schema": "Expense",
+      "description": "Collection of all expense records"
+    },
+    "admins": {
+      "schema": "AppAdmin",
+      "description": "List of authorized administrators"
+    }
+  }
+}

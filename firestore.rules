@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'ajai25032003@gmail.com'
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for Income
+    function isValidIncome(data) {
+      return data.keys().hasAll(['date', 'source', 'amount', 'createdBy']) &&
+             data.keys().size() <= 6 &&
+             data.date is string &&
+             data.source is string && data.source.size() <= 100 &&
+             data.amount is number && data.amount >= 0 &&
+             data.createdBy == request.auth.uid;
+    }
+
+    // Validation for Expense
+    function isValidExpense(data) {
+      return data.keys().hasAll(['date', 'category', 'amount', 'createdBy']) &&
+             data.keys().size() <= 6 &&
+             data.date is string &&
+             data.category is string && data.category.size() <= 100 &&
+             data.amount is number && data.amount >= 0 &&
+             data.createdBy == request.auth.uid;
+    }
+
+    // Rules for Incomes
+    match /incomes/{incomeId} {
+      allow list: if isAdmin();
+      allow get: if isAdmin();
+      allow create: if isAdmin() && isValidIncome(incoming());
+      allow update: if isAdmin() && isValidIncome(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['date', 'source', 'amount', 'description'])
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Rules for Expenses
+    match /expenses/{expenseId} {
+      allow list: if isAdmin();
+      allow get: if isAdmin();
+      allow create: if isAdmin() && isValidExpense(incoming());
+      allow update: if isAdmin() && isValidExpense(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['date', 'category', 'amount', 'description'])
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Rules for Admins
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin(); // Only existing admins or the bootstrapped email can add new admins
+    }
+  }
+}
