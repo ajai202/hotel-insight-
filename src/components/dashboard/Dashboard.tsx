@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db, collection, onSnapshot, query, addDoc } from '../../lib/firebase';
-import { auth } from '../../lib/firebase';
+import { db, collection, onSnapshot, query } from '../../lib/firebase';
 import { Income, Expense } from '../../types';
 import { 
   TrendingUp, 
@@ -8,9 +7,7 @@ import {
   IndianRupee, 
   Wallet,
   ArrowUpRight,
-  ArrowDownRight,
-  Database,
-  Loader2
+  ArrowDownRight
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -24,13 +21,12 @@ import {
   Area 
 } from 'recharts';
 import { formatCurrency, cn } from '../../lib/utils';
-import { startOfMonth, subMonths, format, isWithinInterval, endOfMonth, subDays } from 'date-fns';
+import { startOfMonth, subMonths, format, isWithinInterval, endOfMonth } from 'date-fns';
 
 export default function Dashboard() {
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const qIncome = query(collection(db, 'incomes'));
@@ -50,49 +46,6 @@ export default function Dashboard() {
       unsubExpense();
     };
   }, []);
-
-  const generateInitialData = async () => {
-    if (!auth.currentUser) return;
-    const uid = auth.currentUser.uid;
-    setIsGenerating(true);
-
-    const incomeCategories = ['Room Booking', 'Restaurant', 'Spa', 'Event', 'Other'];
-    const expenseCategories = ['Salaries', 'Maintenance', 'Utilities', 'Food & Beverage', 'Marketing'];
-
-    try {
-      const promises = [];
-      // Generate roughly 1 entry for every 3 days for the past 6 months
-      for (let i = 0; i < 180; i += 3) {
-        const d = subDays(new Date(), i).toISOString();
-        
-        promises.push(
-          addDoc(collection(db, 'incomes'), {
-            date: d,
-            source: incomeCategories[Math.floor(Math.random() * incomeCategories.length)],
-            amount: Math.floor(Math.random() * 50000) + 10000,
-            description: 'Auto-generated income',
-            createdBy: uid
-          })
-        );
-
-        promises.push(
-          addDoc(collection(db, 'expenses'), {
-            date: d,
-            category: expenseCategories[Math.floor(Math.random() * expenseCategories.length)],
-            amount: Math.floor(Math.random() * 30000) + 5000,
-            description: 'Auto-generated expense',
-            createdBy: uid
-          })
-        );
-      }
-      
-      await Promise.all(promises);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
   const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
@@ -147,15 +100,6 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 italic serif font-serif">Financial Overview</h1>
           <p className="text-gray-500">Real-time tracking of hotel performance metrics.</p>
         </div>
-        <button
-          onClick={generateInitialData}
-          disabled={isGenerating || incomes.length > 50}
-          className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-100 transition-all hover:bg-indigo-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          title={incomes.length > 50 ? "Sample data already generated" : "Generate 6 months of sample data"}
-        >
-          {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Database className="h-4 w-4" />}
-          Generate Demo Data
-        </button>
       </header>
 
       {/* Summary Cards */}
