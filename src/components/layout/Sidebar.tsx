@@ -79,6 +79,19 @@ export default function Sidebar({ activeView, setView, logout, user, isOpen, clo
         ))}
       </nav>
 
+      <div className="px-8 py-6">
+        <div className="rounded-sm border border-stone-800 bg-stone-900/50 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-stone-500">System Status</span>
+            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-stone-300">Operational</span>
+            <span className="text-[9px] text-stone-600 font-mono">v1.2.4-stable</span>
+          </div>
+        </div>
+      </div>
+
       {user && (
         <div className="border-t border-white/5 p-6">
           <div className="mb-6 flex items-center gap-3.5 overflow-hidden p-2">
