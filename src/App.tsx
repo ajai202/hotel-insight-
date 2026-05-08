@@ -62,38 +62,6 @@ export default function App() {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-stone-50 p-4">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md rounded-sm bg-white p-10 shadow-sm border border-stone-200"
-        >
-          <div className="mb-10 flex flex-col items-center justify-center text-center">
-            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-sm bg-stone-900 shadow-lg">
-              <Hotel className="h-7 w-7 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight text-stone-900 font-serif">Hotel Insight</h1>
-            <p className="mt-3 text-sm text-stone-500 font-medium">Income & Expense Prediction System</p>
-          </div>
-          
-          <button
-            onClick={handleLogin}
-            className="flex w-full items-center justify-center gap-3 rounded-sm bg-stone-900 px-6 py-4 text-sm font-semibold text-white transition-all hover:bg-stone-800 hover:shadow-md hover:-translate-y-0.5 active:scale-95"
-          >
-            <LogIn className="h-4 w-4" />
-            Sign in as Administrator
-          </button>
-          
-          <p className="mt-8 text-center text-xs text-stone-400 font-medium max-w-xs mx-auto tracking-wide">
-            Secure admin-only access. Professional dashboard for hotel financial management.
-          </p>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-screen w-full overflow-hidden bg-stone-50 flex-col md:flex-row font-sans selection:bg-stone-900 selection:text-white">
       {/* Mobile Top Bar */}

@@ -24,7 +24,7 @@ export default function IncomeManager() {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !auth.currentUser) return;
+    if (!file) return;
 
     setIsUploading(true);
     Papa.parse(file, {
@@ -47,7 +47,7 @@ export default function IncomeManager() {
               source: row.source || 'Other',
               amount: parseFloat(row.amount) || 0,
               description: row.description || '',
-              createdBy: auth.currentUser!.uid
+              createdBy: auth.currentUser?.uid || 'guest'
             };
             return addDoc(collection(db, 'incomes'), payload);
           });
@@ -78,13 +78,12 @@ export default function IncomeManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth.currentUser) return;
 
     try {
       const payload = {
         ...formData,
         amount: parseFloat(formData.amount),
-        createdBy: auth.currentUser.uid
+        createdBy: auth.currentUser?.uid || 'guest'
       };
 
       if (editingId) {

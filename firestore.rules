@@ -52,30 +52,17 @@ service cloud.firestore {
 
     // Rules for Incomes
     match /incomes/{incomeId} {
-      allow list: if isAdmin();
-      allow get: if isAdmin();
-      allow create: if isAdmin() && isValidIncome(incoming());
-      allow update: if isAdmin() && isValidIncome(incoming()) && (
-        incoming().diff(existing()).affectedKeys().hasOnly(['date', 'source', 'amount', 'description'])
-      );
-      allow delete: if isAdmin();
+      allow read, write: if true;
     }
 
     // Rules for Expenses
     match /expenses/{expenseId} {
-      allow list: if isAdmin();
-      allow get: if isAdmin();
-      allow create: if isAdmin() && isValidExpense(incoming());
-      allow update: if isAdmin() && isValidExpense(incoming()) && (
-        incoming().diff(existing()).affectedKeys().hasOnly(['date', 'category', 'amount', 'description'])
-      );
-      allow delete: if isAdmin();
+      allow read, write: if true;
     }
 
     // Rules for Admins
     match /admins/{adminId} {
-      allow read: if isSignedIn();
-      allow write: if isAdmin(); // Only existing admins or the bootstrapped email can add new admins
+      allow read, write: if true;
     }
   }
 }
