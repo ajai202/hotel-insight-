@@ -3,18 +3,26 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { onAuthStateChanged, User, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, googleProvider } from './lib/firebase';
 import { ViewState } from './types';
 import Sidebar from './components/layout/Sidebar';
-import Dashboard from './components/dashboard/Dashboard';
-import IncomeManager from './components/finance/IncomeManager';
-import ExpenseManager from './components/finance/ExpenseManager';
-import PredictionView from './components/prediction/PredictionView';
-import ReportGenerator from './components/reports/ReportGenerator';
 import { LogIn, Hotel } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Lazy load view components
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
+const IncomeManager = lazy(() => import('./components/finance/IncomeManager'));
+const ExpenseManager = lazy(() => import('./components/finance/ExpenseManager'));
+const PredictionView = lazy(() => import('./components/prediction/PredictionView'));
+const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
+
+const LoadingFallback = () => (
+  <div className="flex h-full w-full items-center justify-center p-20">
+    <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
+  </div>
+);
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -48,37 +56,37 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+      <div className="flex h-screen w-full items-center justify-center bg-stone-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-[#f5f5f5] p-4">
+      <div className="flex h-screen w-full items-center justify-center bg-stone-50 p-4">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl shadow-gray-200/50"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md rounded-sm bg-white p-10 shadow-sm border border-stone-200"
         >
-          <div className="mb-8 flex flex-col items-center text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200">
-              <Hotel className="h-8 w-8 text-white" />
+          <div className="mb-10 flex flex-col items-center justify-center text-center">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-sm bg-stone-900 shadow-lg">
+              <Hotel className="h-7 w-7 text-white" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Hotel Insight</h1>
-            <p className="mt-2 text-sm text-gray-500">Income & Expense Prediction System</p>
+            <h1 className="text-3xl font-bold tracking-tight text-stone-900 font-serif">Hotel Insight</h1>
+            <p className="mt-3 text-sm text-stone-500 font-medium">Income & Expense Prediction System</p>
           </div>
           
           <button
             onClick={handleLogin}
-            className="flex w-full items-center justify-center gap-3 rounded-xl bg-gray-900 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-gray-800 hover:shadow-lg active:scale-95"
+            className="flex w-full items-center justify-center gap-3 rounded-sm bg-stone-900 px-6 py-4 text-sm font-semibold text-white transition-all hover:bg-stone-800 hover:shadow-md hover:-translate-y-0.5 active:scale-95"
           >
             <LogIn className="h-4 w-4" />
             Sign in as Administrator
           </button>
           
-          <p className="mt-6 text-center text-xs text-gray-400">
+          <p className="mt-8 text-center text-xs text-stone-400 font-medium max-w-xs mx-auto tracking-wide">
             Secure admin-only access. Professional dashboard for hotel financial management.
           </p>
         </motion.div>
@@ -87,18 +95,18 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-gray-50 flex-col md:flex-row">
+    <div className="flex h-screen w-full overflow-hidden bg-stone-50 flex-col md:flex-row font-sans selection:bg-stone-900 selection:text-white">
       {/* Mobile Top Bar */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white p-4 md:hidden">
+      <div className="flex items-center justify-between border-b border-stone-200/50 bg-white/70 backdrop-blur-xl p-4 md:hidden">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 shadow-lg shadow-indigo-100">
-            <Hotel className="h-6 w-6 text-white" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-stone-900 shadow-sm">
+            <Hotel className="h-5 w-5 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-gray-900">Hotel Insight</span>
+          <span className="text-xl font-bold tracking-tight text-stone-900 font-serif">Hotel Insight</span>
         </div>
         <button 
           onClick={() => setIsSidebarOpen(true)}
-          className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+          className="rounded-sm p-2 text-stone-600 hover:bg-stone-100"
         >
           <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -125,11 +133,13 @@ export default function App() {
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {activeView === 'dashboard' && <Dashboard />}
-              {activeView === 'income' && <IncomeManager />}
-              {activeView === 'expenses' && <ExpenseManager />}
-              {activeView === 'prediction' && <PredictionView />}
-              {activeView === 'reports' && <ReportGenerator />}
+              <Suspense fallback={<LoadingFallback />}>
+                {activeView === 'dashboard' && <Dashboard />}
+                {activeView === 'income' && <IncomeManager />}
+                {activeView === 'expenses' && <ExpenseManager />}
+                {activeView === 'prediction' && <PredictionView />}
+                {activeView === 'reports' && <ReportGenerator />}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </div>

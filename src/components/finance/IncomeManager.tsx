@@ -141,14 +141,31 @@ export default function IncomeManager() {
     i.description.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleExportCSV = () => {
+    const csv = Papa.unparse(filteredIncomes.map(i => ({
+      Date: formatDate(i.date),
+      Source: i.source,
+      Amount: i.amount,
+      Description: i.description
+    })));
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `incomes_export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-[1600px] mx-auto pb-12">
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 font-serif italic">Income Records</h1>
-          <p className="text-gray-500 text-sm">Manage daily revenue streams and room bookings.</p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-stone-900 font-serif">Income Records</h1>
+          <p className="text-stone-500 font-medium mt-2">Manage daily revenue streams and room bookings.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-3">
           <input
             type="file"
             accept=".csv"
@@ -159,14 +176,21 @@ export default function IncomeManager() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="flex flex-1 md:flex-none items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50 active:scale-95 disabled:opacity-50"
+            className="flex flex-1 md:flex-none items-center justify-center gap-2 rounded-sm border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition-all hover:bg-stone-50 hover:shadow-sm active:scale-95 disabled:opacity-50"
           >
             {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             Upload CSV
           </button>
           <button
+            onClick={handleExportCSV}
+            className="flex flex-1 md:flex-none items-center justify-center gap-2 rounded-sm border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition-all hover:bg-stone-50 hover:shadow-sm active:scale-95"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </button>
+          <button
             onClick={() => setIsModalOpen(true)}
-            className="flex flex-1 md:flex-none items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-100 transition-all hover:bg-indigo-700 active:scale-95"
+            className="flex flex-1 md:flex-none items-center justify-center gap-2 rounded-sm bg-stone-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-stone-800 hover:shadow-md active:scale-95"
           >
             <Plus className="h-4 w-4" />
             Add Income
@@ -174,51 +198,51 @@ export default function IncomeManager() {
         </div>
       </header>
 
-      <div className="flex flex-col gap-4 sm:flex-row">
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
           <input
             type="text"
             placeholder="Search income records..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition-all focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50/50"
+            className="w-full rounded-sm border border-stone-200 bg-white py-3 pl-11 pr-4 text-sm font-medium outline-none transition-all focus:border-stone-500 focus:ring-1 focus:ring-stone-500/10"
           />
         </div>
-        <button className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        <button className="flex items-center justify-center gap-2 rounded-sm border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition-colors">
           <Filter className="h-4 w-4" />
           Filter
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-sm border border-stone-200 bg-white shadow-sm">
         <table className="w-full text-left min-w-[600px]">
           <thead>
-            <tr className="bg-gray-50/50 border-b border-gray-100 text-xs font-bold uppercase tracking-wider text-gray-500 font-mono">
-              <th className="px-6 py-4">Date</th>
-              <th className="px-6 py-4">Source</th>
-              <th className="px-6 py-4">Amount</th>
-              <th className="px-6 py-4">Description</th>
-              <th className="px-6 py-4 text-right">Actions</th>
+            <tr className="bg-stone-50/50 border-b border-stone-200 text-[11px] font-bold uppercase tracking-widest text-stone-500">
+              <th className="px-6 py-5">Date</th>
+              <th className="px-6 py-5">Source</th>
+              <th className="px-6 py-5">Amount</th>
+              <th className="px-6 py-5">Description</th>
+              <th className="px-6 py-5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-stone-100">
             {filteredIncomes.map((income) => (
-              <tr key={income.id} className="group transition-colors hover:bg-gray-50/50">
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{formatDate(income.date)}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  <span className="inline-flex rounded-lg bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+              <tr key={income.id} className="group transition-colors hover:bg-stone-50/50">
+                <td className="px-6 py-5 text-sm font-medium text-stone-700">{formatDate(income.date)}</td>
+                <td className="px-6 py-5 text-sm">
+                  <span className="inline-flex rounded-sm bg-stone-100 px-3 py-1 text-xs font-bold text-stone-700 border border-stone-200">
                     {income.source}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm font-bold text-gray-900">{formatCurrency(income.amount)}</td>
-                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{income.description}</td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex justify-end gap-2 text-gray-400 group-hover:text-gray-600">
-                    <button onClick={() => handleEdit(income)} className="p-1 hover:text-indigo-600">
+                <td className="px-6 py-5 text-sm font-bold text-stone-900 tracking-tight font-serif text-[1rem]">{formatCurrency(income.amount)}</td>
+                <td className="px-6 py-5 text-sm font-medium text-stone-500 max-w-[200px] truncate">{income.description}</td>
+                <td className="px-6 py-5 text-right">
+                  <div className="flex justify-end gap-2 text-stone-400 group-hover:text-stone-600">
+                    <button onClick={() => handleEdit(income)} className="rounded-sm p-2 hover:bg-white hover:text-stone-900 hover:shadow-sm border border-transparent hover:border-stone-200 transition-all">
                       <Edit2 className="h-4 w-4" />
                     </button>
-                    <button onClick={() => handleDelete(income.id!)} className="p-1 hover:text-red-500">
+                    <button onClick={() => handleDelete(income.id!)} className="rounded-sm p-2 hover:bg-red-50 hover:text-red-700 hover:shadow-sm border border-transparent hover:border-red-200 transition-all">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -229,7 +253,7 @@ export default function IncomeManager() {
         </table>
         {filteredIncomes.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-gray-400">No income records found.</p>
+            <p className="text-stone-400 font-medium tracking-wide">No income records found.</p>
           </div>
         )}
       </div>
@@ -242,41 +266,41 @@ export default function IncomeManager() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={resetForm}
-              className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-2xl bg-white p-6 md:p-8 shadow-2xl"
+              className="relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-sm bg-white p-6 md:p-8 shadow-xl"
             >
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold font-serif italic text-gray-900">
+                <h2 className="text-2xl font-bold font-serif text-stone-900">
                   {editingId ? 'Edit Income' : 'Add New Income'}
                 </h2>
-                <button onClick={resetForm} className="rounded-full p-2 hover:bg-gray-100">
-                  <X className="h-5 w-5 text-gray-500" />
+                <button onClick={resetForm} className="rounded-sm p-2 hover:bg-stone-100">
+                  <X className="h-5 w-5 text-stone-500" />
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 ml-1">Date</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-stone-500 mb-1.5">Date</label>
                   <input
                     required
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50"
+                    className="w-full rounded-sm border border-stone-200 px-4 py-3 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500/10"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 ml-1">Source</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-stone-500 mb-1.5">Source</label>
                   <select
                     required
                     value={formData.source}
                     onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50"
+                    className="w-full rounded-sm border border-stone-200 px-4 py-3 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500/10"
                   >
                     <option value="">Select source</option>
                     <option value="Room Booking">Room Booking</option>
@@ -288,7 +312,7 @@ export default function IncomeManager() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 ml-1">Amount</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-stone-500 mb-1.5">Amount</label>
                   <input
                     required
                     type="number"
@@ -296,23 +320,23 @@ export default function IncomeManager() {
                     placeholder="0.00"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50"
+                    className="w-full rounded-sm border border-stone-200 px-4 py-3 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500/10"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 ml-1">Description</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-stone-500 mb-1.5">Description</label>
                   <textarea
                     rows={3}
                     placeholder="Optional details..."
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50"
+                    className="w-full rounded-sm border border-stone-200 px-4 py-3 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500/10"
                   />
                 </div>
                 <div className="pt-4">
                   <button
                     type="submit"
-                    className="w-full rounded-xl bg-indigo-600 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-100 transition-all hover:bg-indigo-700 active:scale-95"
+                    className="w-full rounded-sm bg-stone-900 py-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-stone-800 active:scale-95"
                   >
                     {editingId ? 'Update Record' : 'Save Income'}
                   </button>
@@ -331,26 +355,26 @@ export default function IncomeManager() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setDeletingId(null)}
-              className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+              className="relative w-full max-w-sm rounded-sm bg-white p-8 shadow-xl border border-stone-200"
             >
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Confirm Deletion</h3>
-              <p className="text-gray-500 mb-6 text-sm">Are you sure you want to delete this record? This action cannot be undone.</p>
+              <h3 className="text-xl font-bold text-stone-900 mb-2 font-serif">Confirm Deletion</h3>
+              <p className="text-stone-500 mb-8 text-sm font-medium">Are you sure you want to delete this record? This action cannot be undone.</p>
               <div className="flex justify-end gap-3">
                 <button 
                   onClick={() => setDeletingId(null)} 
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-sm transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={confirmDelete} 
-                  className="px-4 py-2 text-sm bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors shadow-lg shadow-red-100"
+                  className="px-5 py-2.5 text-sm bg-red-700 text-white font-bold rounded-sm hover:bg-red-800 transition-colors shadow-sm"
                 >
                   Delete
                 </button>

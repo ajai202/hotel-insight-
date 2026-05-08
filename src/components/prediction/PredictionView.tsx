@@ -90,14 +90,14 @@ export default function PredictionView() {
   </div>;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-[1600px] mx-auto pb-12">
       <header className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-100">
-          <BrainCircuit className="h-6 w-6 text-white" />
+        <div className="flex h-14 w-14 items-center justify-center rounded-sm bg-stone-900 shadow-sm border border-stone-800">
+          <BrainCircuit className="h-7 w-7 text-white" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 font-serif italic">AI Financial Prediction</h1>
-          <p className="text-gray-500">ML-powered forecasting based on your historical hotel data.</p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-stone-900 font-serif">AI Financial Prediction</h1>
+          <p className="text-stone-500 font-medium mt-1">ML-powered forecasting based on your historical hotel data.</p>
         </div>
       </header>
 
@@ -124,42 +124,42 @@ export default function PredictionView() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
+      <div className="rounded-sm border border-stone-200 bg-white p-6 md:p-8 shadow-sm">
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Historical Trend Analysis</h3>
-            <p className="text-sm text-gray-500">Tracking the last 6 months of financial behavior.</p>
+            <h3 className="text-xl font-bold text-stone-900 font-serif">Historical Trend Analysis</h3>
+            <p className="text-sm font-medium text-stone-500 mt-1">Tracking the last 6 months of financial behavior.</p>
           </div>
-          <div className="flex items-center gap-2 rounded-xl bg-indigo-50 px-4 py-2 text-xs font-bold text-indigo-700">
-            <Sparkles className="h-3 w-3" />
+          <div className="flex items-center gap-2 rounded-sm bg-indigo-50 border border-indigo-100 px-4 py-2 text-xs font-bold text-indigo-800 tracking-wider">
+            <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
             LINEAR REGRESSION MODEL ACTIVE
           </div>
         </div>
 
         <div className="w-full min-w-[0] min-h-[400px] h-[400px]">
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9CA3AF' }} dy={10} />
-              <YAxis hide />
+            <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" strokeWidth={1} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: '#78716c', fontWeight: 500 }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: '#78716c', fontWeight: 500 }} tickFormatter={(value) => `₹${value / 1000}k`} />
               <Tooltip 
-                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                contentStyle={{ borderRadius: '4px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)', fontWeight: 500, color: '#1c1917' }}
                 formatter={(val: number) => formatCurrency(val)}
               />
-              <Legend verticalAlign="top" height={36}/>
-              <Line type="monotone" dataKey="income" stroke="#6366F1" strokeWidth={4} dot={{ r: 6, fill: '#6366F1', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="expense" stroke="#F43F5E" strokeWidth={4} dot={{ r: 6, fill: '#F43F5E', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8 }} />
+              <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', fontWeight: 600, color: '#78716c', textTransform: 'uppercase', letterSpacing: '0.05em' }}/>
+              <Line type="monotone" name="Income" dataKey="income" stroke="#1c1917" strokeWidth={3} dot={{ r: 5, fill: '#1c1917', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 7 }} />
+              <Line type="monotone" name="Expense" dataKey="expense" stroke="#991b1b" strokeWidth={3} dot={{ r: 5, fill: '#991b1b', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 7 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-gray-900 p-8 text-white shadow-xl">
+      <div className="rounded-sm bg-stone-900 border border-stone-800 p-8 text-white shadow-md">
         <div className="flex items-center gap-4 mb-4">
-          <AlertCircle className="h-6 w-6 text-indigo-400" />
-          <h4 className="text-lg font-bold">Understanding the Forecast</h4>
+          <AlertCircle className="h-6 w-6 text-stone-400" />
+          <h4 className="text-lg font-bold font-serif">Understanding the Forecast</h4>
         </div>
-        <p className="text-gray-400 leading-relaxed text-sm">
+        <p className="text-stone-400 leading-relaxed text-[0.95rem]">
           Our prediction module utilizes a <strong>Linear Regression algorithm</strong> to analyze patterns in your income and spending. 
           By calculating the "line of best fit" through your historical data points, the system can estimate future performance. 
           Note that these results are mathematical projections and may not account for seasonal spikes, market fluctuations, or sudden administrative changes.
@@ -171,22 +171,35 @@ export default function PredictionView() {
 
 function PredictionCard({ title, value, subtitle, color }: any) {
   const colors = {
-    indigo: "from-indigo-600 to-indigo-700 shadow-indigo-100",
-    rose: "from-rose-600 to-rose-700 shadow-rose-100",
-    emerald: "from-emerald-600 to-emerald-700 shadow-emerald-100"
+    indigo: "bg-white border border-stone-200 shadow-sm",
+    rose: "bg-white border border-stone-200 shadow-sm",
+    emerald: "bg-white border border-stone-200 shadow-sm"
+  };
+
+  const accentColors = {
+    indigo: "text-stone-900",
+    rose: "text-red-800",
+    emerald: "text-emerald-700"
+  };
+
+  const subtitleColors = {
+    indigo: "text-stone-500",
+    rose: "text-red-500",
+    emerald: "text-emerald-600"
   };
 
   return (
-    <div className={cn("relative overflow-hidden rounded-2xl p-6 text-white shadow-xl", colors[color as keyof typeof colors])}>
+    <div className={cn("relative overflow-hidden rounded-sm p-8 transition-transform hover:-translate-y-1", colors[color as keyof typeof colors])}>
       <div className="relative z-10">
-        <p className="text-sm font-medium opacity-80 uppercase tracking-widest">{title}</p>
-        <p className="mt-2 text-3xl font-bold tracking-tight">{formatCurrency(value)}</p>
-        <p className="mt-4 flex items-center gap-2 text-xs font-medium opacity-90">
-          <TrendingUp className="h-3 w-3" />
+        <p className="text-[11px] uppercase tracking-widest font-bold text-stone-500">{title}</p>
+        <p className={cn("mt-3 text-3xl font-bold font-serif", accentColors[color as keyof typeof accentColors])}>
+          {value != null && !isNaN(value) ? formatCurrency(value) : "Calculating..."}
+        </p>
+        <p className={cn("mt-5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider", subtitleColors[color as keyof typeof subtitleColors])}>
+          <TrendingUp className="h-3.5 w-3.5" />
           {subtitle}
         </p>
       </div>
-      <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
     </div>
   );
 }
